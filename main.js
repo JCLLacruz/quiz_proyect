@@ -19,7 +19,8 @@ const startQuiz = (e) => {
     
     questionsDiv.classList.remove('d-none');
 
-    generateQuestion();
+    //setNextQuestion();
+
     console.log('Array de questions:', questions);
 };
 
@@ -44,8 +45,13 @@ const generateQuestion = (question) => {
         const answersKeys = Object.keys(question.answers);
         const buttonAnswer = document.createElement('button');
         buttonAnswer.innerText = answer;
+        console.log('Respuesta',answer);
+
 
     });
- 
-
 };
+
+const setNextQuestion = () => {
+    generateQuestion(questions[currentQuestionIndex]);
+    console.log(questions[currentQuestionIndex]);
+}
