@@ -9,6 +9,8 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"
         async></script>
     <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" async></script>
+    <script src="graphics.js" async></script>
     <script src="main.js" async></script>
     <title>Quiz-Proyect</title>
 </head>
@@ -20,28 +22,29 @@
                 <h1>Quiz</h1>
             </div>
         </div>
-        <div id="home-div" class="container shadow rounder p-3 bg-white">
+        <div id="home-div" class="container shadow rounder p-3 bg-white mh-100">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Name:</span>
+                <input id="input-user-name" type="text" class="form-control" aria-label="Sizing input">
+            </div>
             <form id="user-form" class="d-flex flex-column">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-default">Nombre:</span>
-                    <input id="input-user-name" type="text" class="form-control" aria-label="Sizing input">
-                    <div id="error_name"></div>
-                </div>
-                <button id="start-button" class="btn btn-primary">Comenzar</button>
+                <button id="start-button" class="btn btn-primary">Start</button>
             </form>
         </div>
         <div id="questions-div" class="container shadow rounder p-3 bg-white d-none">
+            <h1 id="single_question_title"></h1>
             <form id="answers_form" class="container rounder p-3 bg-white">
-                <h1 id="single_question_title"></h1>
                 <div id="inputs_answers_form" class="d-flex flex-column">
-                    
+
                 </div>
                 <button id="next_btn_form" class="btn btn-primary" type="submit">Next</button>
             </form>
         </div>
         <div id="results-div" class=" container shadow rounder p-3 bg-white d-none">
-resultados
+            <canvas id="myChart"></canvas>
+            <button id="restart-btn"></button>
         </div>
+        <div id="error_holder"></div>
     </main>
 </body>
 
