@@ -1,11 +1,18 @@
-const homeDiv = document.getElementById('homeDiv');
-const questionsDiv = document.getElementById('questionsDiv');
-const resultsDiv = document.getElementById('resultsDiv');
-const startButton = document.getElementById('startButton');
+const homeDiv = document.getElementById('home-div');
+const questionsDiv = document.getElementById('questions-div');
+const resultsDiv = document.getElementById('results-div');
+const startButton = document.getElementById('start-button');
+const inputUserName = document.getElementById('input-user-name');
+const nextBtnForm = document.getElementById('next_btn_form');
+const answersForm = document.getElementById('answers_form');
+const singleQuestionTitle = document.getElementById('single_question_title');
+const inputsAnswersHolder = document.getElementById('inputs_answers_form');
+const errorName = document.getElementById('error_name');
 
 let currentQuestionIndex = 0;
 
-let correctAnswersCounter;
+let correctAnswerKey;
+let correctAnswersCounter = 0;
 
 let questions = [];
 axios.get('https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl&limit=10')
@@ -15,17 +22,14 @@ axios.get('https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxg
 
 const startQuiz = (e) => {
     e.preventDefault();
-    let currentQuestionIndex = 0;
-    displayNone();
-
-    questionsDiv.classList.remove('d-none');
-
-    setNextQuestion(currentQuestionIndex);
-
-    console.log('Array de questions:', questions);
+    if (nameValidation()) {
+        let currentQuestionIndex = 0;
+        displayNone();
+        questionsDiv.classList.remove('d-none');
+    
+        setNextQuestion(currentQuestionIndex);
+    }
 };
-
-startButton.addEventListener('click', startQuiz);
 
 const displayNone = () => {
     homeDiv.classList.add('d-none');
@@ -34,40 +38,73 @@ const displayNone = () => {
 };
 
 const generateQuestion = (question) => {
-    const singleQuestion = document.createElement('div');
-    singleQuestion.setAttribute('class', 'container rounder p-3 bg-white');
-    const h2Question = document.createElement('h2');
-    h2Question.innerText = question.question;
-    questionsDiv.appendChild(singleQuestion);
-    singleQuestion.appendChild(h2Question);
-    const answersContainer = document.createElement('div');
-    answersContainer.setAttribute('class', 'container rounder p-3 bg-white');
-    questionsDiv.appendChild(answersContainer);
-    
+    console.log('Pregunta', question);
+    inputsAnswersHolder.innerHTML = '';
+    singleQuestionTitle.innerText = '';
+    singleQuestionTitle.innerText = question.question;
+
     let answers = Object.entries(question.answers);
-    console.log('Question',question);
-    console.log('Answers', answers);
-    answers.forEach(([key, value]) => {
+    let shuffledAnswers = answers.sort(() => Math.random() - 0.5);
+
+    shuffledAnswers.forEach(([key, value]) => {
         if (value !== null) {
-            const buttonAnswer = document.createElement('button');
-            buttonAnswer.innerText = value;
-            buttonAnswer.setAttribute('class', 'btn btn-primary')
-            answersContainer.appendChild(buttonAnswer);
-            console.log('Respuesta', value);
-            console.log('keys', key);
-        }
-        if (question.multiple_correct_answers === true ){
-            const multipleAnswersP = document.createElement('p');
-            multipleAnswersP.innerText = 'Multiple options are correct';
-        } else {
-            if (question.correct_answer === key){
-                //buttonAnswer.addEventListener('click', selectAnswer);
-            }
+
+            value = capitalize(value);
+
+            Object.entries(question.correct_answers).forEach(([key, value]) => {
+                if (value === 'true') {
+                    correctAnswerKey = key.replace('_correct', '');
+                }
+            })
+            inputsAnswersHolder.innerHTML += `<div class="container d-flex align-items-center gap-3 mb-3">
+                <div><label for="${key}">-     ${value}</label></div><input id ="${key}" type="radio" calss="d-flex align-items-start" name="answer" required></div>`;
         }
     });
 };
 
 const setNextQuestion = (currentQuestionIndex) => {
     generateQuestion(questions[currentQuestionIndex]);
-    console.log(questions[currentQuestionIndex]);
 }
+
+const nextAnswer = (e) => {
+    e.preventDefault();
+    const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked;
+    if (statusAnswer) {
+        correctAnswersCounter += 1;
+    }
+    currentQuestionIndex++;
+    if (questions.length > currentQuestionIndex + 1) {
+        setNextQuestion(currentQuestionIndex);
+    } else {
+        displayNone();
+        resultsDiv.classList.remove('d-none');
+    }
+}
+
+const capitalize = (text) => {
+    const firstLetter = text.charAt(0);
+    const rest = text.slice(1);
+    return firstLetter.toUpperCase() + rest;
+}
+
+const nameValidation = () => {
+    if (inputUserName.value === '') {
+        appendAlert('Please fill out the name field.', 'danger', errorName)
+        return false;
+    } else {
+        return true;
+    }
+}
+
+//Funcion para generar Alerts. Primer argumento para el mensaje. Segundo para el tipo segun Bootstrap https://getbootstrap.com/docs/5.3/components/alerts/#link-color
+const appendAlert = (message, type, where) => {
+    where.innerHTML = `<div id='appendedWraper' class="position-absolute ml-3 alert alert-${type} alert-dismissible" role="alert">
+                            <div>${message}</div>
+                        </div>`;
+    setTimeout(function () {
+        where.innerHTML = '';
+    }, 3000);
+}
+
+startButton.addEventListener('click', startQuiz);
+nextBtnForm.addEventListener('click', nextAnswer);
