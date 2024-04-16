@@ -1,6 +1,7 @@
 const homeDiv = document.getElementById('home-div');
 const questionsDiv = document.getElementById('questions-div');
 const resultsDiv = document.getElementById('results-div');
+const contactDiv = document.getElementById('contact-div');
 const startButton = document.getElementById('start-button');
 const inputUserName = document.getElementById('input-user-name');
 const nextBtnForm = document.getElementById('next_btn_form');
@@ -9,7 +10,10 @@ const singleQuestionTitle = document.getElementById('single_question_title');
 const inputsAnswersHolder = document.getElementById('inputs_answers_form');
 const error = document.getElementById('error_holder');
 const restartBtn = document.getElementById('restart-btn');
-const yourScoreDiv = document.getElementById('your_score');
+const yourScoreDiv = document.getElementById('your-score');
+const titleQuizLink = document.getElementById('titleQuiz');
+const navLinkStats = document.getElementById('nav-link-stats');
+const navLinkContact = document.getElementById('nav-link-contact');
 
 let questions;
 let currentQuestionIndex;
@@ -18,6 +22,10 @@ let correctAnswerKey;
 let correctAnswersCounter = 0;
 
 let URLAPI = 'https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl&limit=10';
+
+const goToLink = (url) => {
+    window.location.href = url;
+}
 
 const downloadData = async () => {
     try {
@@ -48,6 +56,8 @@ const displayNone = () => {
     homeDiv.classList.add('d-none');
     questionsDiv.classList.add('d-none');
     resultsDiv.classList.add('d-none');
+    contactDiv.classList.add('d-none');
+    restartBtn.classList.add('d-none');
 };
 
 const nameValidation = () => {
@@ -161,6 +171,7 @@ const nextAnswer = (e) => {
             showChart();
             printYourScore(user);
             resultsDiv.classList.remove('d-none');
+            restartBtn.classList.remove('d-none');
         }
     } else {
         appendAlert('Please check one answer.', 'danger', error)
@@ -178,18 +189,11 @@ const startQuiz = (e) => {
     }
 };
 
-startButton.addEventListener('click', startQuiz);
-nextBtnForm.addEventListener('click', nextAnswer);
-restartBtn.addEventListener('click', () => {
-    displayNone();
-    homeDiv.classList.remove('d-none');
-});
-
 const myChart = (config) => new Chart('myChart', config);
 
 const showChart = () => {
     let usersArrChart = JSON.parse(localStorage.getItem("AllUsers"));
-
+    
     let labels = usersArrChart.map(user => user.name);
     let scores = usersArrChart.map(user => user.points);
 
@@ -211,3 +215,22 @@ const showChart = () => {
     myChart(config)
 };
 
+startButton.addEventListener('click', startQuiz);
+nextBtnForm.addEventListener('click', nextAnswer);
+restartBtn.addEventListener('click', () => {
+    displayNone();
+    homeDiv.classList.remove('d-none');
+});
+navLinkStats.addEventListener('click',() => {
+    showChart();
+    displayNone();
+    resultsDiv.classList.remove('d-none');
+});
+navLinkContact.addEventListener('click',() => {
+    displayNone();
+    contactDiv.classList.remove('d-none');
+});
+titleQuizLink.addEventListener('click',() => {
+    displayNone();
+    homeDiv.classList.remove('d-none');
+});
