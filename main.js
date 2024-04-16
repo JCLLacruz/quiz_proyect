@@ -14,6 +14,9 @@ const yourScoreDiv = document.getElementById('your-score');
 const titleQuizLink = document.getElementById('titleQuiz');
 const navLinkStats = document.getElementById('nav-link-stats');
 const navLinkContact = document.getElementById('nav-link-contact');
+const progressBar = document.getElementById('progress-bar');
+const canvasHolder = document.getElementById('canvas-holder');
+const rankingUsersDiv = document.getElementById('ranking_users');
 
 let questions;
 let currentQuestionIndex;
@@ -58,6 +61,8 @@ const displayNone = () => {
     resultsDiv.classList.add('d-none');
     contactDiv.classList.add('d-none');
     restartBtn.classList.add('d-none');
+    canvasHolder.classList.add('d-none');
+    yourScoreDiv.classList.add('d-none');
 };
 
 const nameValidation = () => {
@@ -79,20 +84,21 @@ const answersValidation = () => {
 };
 
 const printYourScore = (user) => {
-    const {name,points} = user;
+    const { name, points } = user;
     const card = document.createElement('div');
     card.setAttribute('class', 'card');
     const cardBody = document.createElement('div');
     cardBody.setAttribute('class', 'card-body');
     const cardTitle = document.createElement('h1');
     cardTitle.setAttribute('class', 'card-title');
-    cardTitle.innerText = `Your Score ${name}`;
+    cardTitle.innerText = `${name}'s Score`;
     const score = document.createElement('h2');
     score.innerText = `${points}/100 points`;
     card.appendChild(cardBody);
     cardBody.appendChild(cardTitle);
     cardBody.appendChild(score);
     yourScoreDiv.appendChild(card);
+    yourScoreDiv.classList.remove('d-none');
 };
 
 const saveUserOnStorage = (user) => {
@@ -121,6 +127,7 @@ const generateQuestion = (question) => {
 
     let answers = Object.entries(question.answers);
     let shuffledAnswers = answers.sort(() => Math.random() - 0.5);
+    console.log('Question', question);
 
     shuffledAnswers.forEach(([key, value]) => {
         if (value !== null) {
@@ -131,7 +138,7 @@ const generateQuestion = (question) => {
                 }
             })
             const div = document.createElement('div');
-            div.setAttribute('class', 'container d-flex align-items-center gap-3 mb-3 justify-content-between');
+            div.setAttribute('class', 'container d-flex align-items-center gap-3 mb-3');
             const label = document.createElement('label');
             label.setAttribute('for', key);
             div.setAttribute('class', 'form-check-label');
@@ -140,7 +147,7 @@ const generateQuestion = (question) => {
             const input = document.createElement('input');
             input.setAttribute('id', key);
             input.setAttribute('type', 'radio');
-            input.setAttribute('class', 'answer form-check-input');
+            input.setAttribute('class', 'answer form-check-input ms-3');
             input.setAttribute('name', 'answer');
             div.appendChild(input);
             inputsAnswersHolder.appendChild(div);
@@ -149,6 +156,8 @@ const generateQuestion = (question) => {
 };
 
 const setNextQuestion = () => {
+    progressBar.setAttribute("style", `width: ${(currentQuestionIndex) * 10}%`);
+    progressBar.setAttribute("aria-valuenow", `${(currentQuestionIndex) * 10}`);
     generateQuestion(questions[currentQuestionIndex]);
 };
 
@@ -160,7 +169,7 @@ const nextAnswer = (e) => {
             correctAnswersCounter += 1;
         }
         currentQuestionIndex++;
-        if (questions.length > currentQuestionIndex + 1) {
+        if (questions.length > currentQuestionIndex) {
             setNextQuestion(currentQuestionIndex);
         } else {
             const user = {};
@@ -168,8 +177,9 @@ const nextAnswer = (e) => {
             user.points = correctAnswersCounter * 10;
             saveUserOnStorage(user);
             displayNone();
-            showChart();
+            showChartAndRanking();
             printYourScore(user);
+            printRanking();
             resultsDiv.classList.remove('d-none');
             restartBtn.classList.remove('d-none');
         }
@@ -191,28 +201,67 @@ const startQuiz = (e) => {
 
 const myChart = (config) => new Chart('myChart', config);
 
-const showChart = () => {
-    let usersArrChart = JSON.parse(localStorage.getItem("AllUsers"));
+const showChartAndRanking = () => {
+    canvasHolder.innerHTML = '';
+    const newCanvas = document.createElement('canvas');
+    newCanvas.setAttribute('id', 'myChart');
+    canvasHolder.appendChild(newCanvas);
+
+    printRanking();
+
+    let usersArrChart = JSON.parse(localStorage.getItem("AllUsers")) || [];
+
+    if (usersArrChart.length !== 0){
+        let labels = usersArrChart.map(user => user.name);
+        let scores = usersArrChart.map(user => user.points);
     
-    let labels = usersArrChart.map(user => user.name);
-    let scores = usersArrChart.map(user => user.points);
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Users Scores',
+                backgroundColor: 'rgb(25, 25, 25)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: scores,
+            }]
+        };
+    
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {}
+        };
+        myChart(config);
+        canvasHolder.classList.remove('d-none');
+    } else {
+        displayNone();
+        resultsDiv.classList.remove('d-none');
 
-    const data = {
-        labels: labels,
-        datasets: [{
-            label: 'Users Scores',
-            backgroundColor: 'rgb(25, 25, 25)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: scores,
-        }]
-    };
+    }
+};
 
-    const config = {
-        type: 'bar',
-        data: data,
-        options: {}
-    };
-    myChart(config)
+const printRanking = () => {
+    rankingUsersDiv.innerHTML = '';
+    let usersArr = JSON.parse(localStorage.getItem("AllUsers")) || [];
+    usersArr = usersArr.sort(((a, b) => a.points - b.points)).toReversed().slice(0, 3);
+
+    if (usersArr.length === 0) {
+        const h2Card = document.createElement('h1');
+        h2Card.innerText = `Sorry!! Nobody has played`;
+        rankingUsersDiv.appendChild(h2Card);
+    } else {
+        usersArr.forEach((user, index) => {
+            const card = document.createElement('div');
+            card.setAttribute('id', `div${user.name}`);
+            card.setAttribute('class', 'card');
+            const cardBody = document.createElement('div');
+            cardBody.setAttribute('class', 'card-body');
+            const h2Card = document.createElement('h2');
+            h2Card.innerText = `${index+1}. ${user.name} whit ${user.points} points.`;
+            card.appendChild(cardBody);
+            cardBody.appendChild(h2Card);
+            rankingUsersDiv.appendChild(card);
+        })
+    }
 };
 
 startButton.addEventListener('click', startQuiz);
@@ -221,16 +270,17 @@ restartBtn.addEventListener('click', () => {
     displayNone();
     homeDiv.classList.remove('d-none');
 });
-navLinkStats.addEventListener('click',() => {
-    showChart();
+navLinkStats.addEventListener('click', () => {
+    showChartAndRanking();
     displayNone();
     resultsDiv.classList.remove('d-none');
+    canvasHolder.classList.remove('d-none');
 });
-navLinkContact.addEventListener('click',() => {
+navLinkContact.addEventListener('click', () => {
     displayNone();
     contactDiv.classList.remove('d-none');
 });
-titleQuizLink.addEventListener('click',() => {
+titleQuizLink.addEventListener('click', () => {
     displayNone();
     homeDiv.classList.remove('d-none');
 });
