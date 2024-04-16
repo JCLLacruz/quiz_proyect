@@ -9,6 +9,7 @@ const singleQuestionTitle = document.getElementById('single_question_title');
 const inputsAnswersHolder = document.getElementById('inputs_answers_form');
 const error = document.getElementById('error_holder');
 const restartBtn = document.getElementById('restart-btn');
+const yourScoreDiv = document.getElementById('your_score');
 
 let questions;
 let currentQuestionIndex;
@@ -49,7 +50,6 @@ const displayNone = () => {
     resultsDiv.classList.add('d-none');
 };
 
-//Validations
 const nameValidation = () => {
     if (inputUserName.value === '') {
         appendAlert('Please fill out the name field.', 'danger', error)
@@ -62,11 +62,27 @@ const nameValidation = () => {
 const answersValidation = () => {
     const inputsAnswers = document.querySelectorAll('.answer');
     for (let i = 0; i < inputsAnswers.length; i++) {
-        console.log('inputs separados',inputsAnswers[i]);
         if (inputsAnswers[i].checked) {
             return true;
-        } 
+        }
     }
+};
+
+const printYourScore = (user) => {
+    const {name,points} = user;
+    const card = document.createElement('div');
+    card.setAttribute('class', 'card');
+    const cardBody = document.createElement('div');
+    cardBody.setAttribute('class', 'card-body');
+    const cardTitle = document.createElement('h1');
+    cardTitle.setAttribute('class', 'card-title');
+    cardTitle.innerText = `Your Score ${name}`;
+    const score = document.createElement('h2');
+    score.innerText = `${points}/100 points`;
+    card.appendChild(cardBody);
+    cardBody.appendChild(cardTitle);
+    cardBody.appendChild(score);
+    yourScoreDiv.appendChild(card);
 };
 
 const saveUserOnStorage = (user) => {
@@ -129,25 +145,26 @@ const setNextQuestion = () => {
 const nextAnswer = (e) => {
     e.preventDefault();
     if (answersValidation()) {
-    const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked; ////------
-    console.log('status answer', statusAnswer);
-    if (statusAnswer) {
-        correctAnswersCounter += 1;
-    }
-    currentQuestionIndex++;
-    if (questions.length > currentQuestionIndex + 1) {
-        setNextQuestion(currentQuestionIndex);
+        const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked;
+        if (statusAnswer) {
+            correctAnswersCounter += 1;
+        }
+        currentQuestionIndex++;
+        if (questions.length > currentQuestionIndex + 1) {
+            setNextQuestion(currentQuestionIndex);
+        } else {
+            const user = {};
+            user.name = inputUserName.value;
+            user.points = correctAnswersCounter * 10;
+            saveUserOnStorage(user);
+            displayNone();
+            showChart();
+            printYourScore(user);
+            resultsDiv.classList.remove('d-none');
+        }
     } else {
-        const user = {};
-        user.name = inputUserName.value;
-        user.points = correctAnswersCounter*10;
-        saveUserOnStorage(user);
-        displayNone();
-        resultsDiv.classList.remove('d-none');
+        appendAlert('Please check one answer.', 'danger', error)
     }
-} else {
-    appendAlert('Please check one answer.', 'danger', error)
-}
 };
 
 const startQuiz = (e) => {
@@ -156,14 +173,41 @@ const startQuiz = (e) => {
     if (nameValidation()) {
         displayNone();
         questionsDiv.classList.remove('d-none');
-    
+
         setNextQuestion(questions, currentQuestionIndex);
     }
 };
 
 startButton.addEventListener('click', startQuiz);
 nextBtnForm.addEventListener('click', nextAnswer);
-restartBtn.addEventListener('click',()=>{
+restartBtn.addEventListener('click', () => {
     displayNone();
     homeDiv.classList.remove('d-none');
 });
+
+const myChart = (config) => new Chart('myChart', config);
+
+const showChart = () => {
+    let usersArrChart = JSON.parse(localStorage.getItem("AllUsers"));
+
+    let labels = usersArrChart.map(user => user.name);
+    let scores = usersArrChart.map(user => user.points);
+
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: 'Users Scores',
+            backgroundColor: 'rgb(25, 25, 25)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: scores,
+        }]
+    };
+
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {}
+    };
+    myChart(config)
+};
+
