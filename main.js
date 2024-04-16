@@ -25,86 +25,28 @@ const downloadData = async () => {
     } catch (error) {
         console.error(error);
     }
-}
+};
 downloadData();
 
-const startQuiz = (e) => {
-    e.preventDefault();
-    currentQuestionIndex = 0;
-    if (nameValidation()) {
-        displayNone();
-        questionsDiv.classList.remove('d-none');
-    
-        setNextQuestion(questions, currentQuestionIndex);
-    }
+const appendAlert = (message, type, where) => {
+    where.innerHTML = `<div id='appendedWraper' class="mt-2 alert alert-${type} alert-dismissible" role="alert">
+                            <div>${message}</div>
+                        </div>`;
+    setTimeout(function () {
+        where.innerHTML = '';
+    }, 3000);
+};
+
+const capitalize = (text) => {
+    const firstLetter = text.charAt(0);
+    const rest = text.slice(1);
+    return firstLetter.toUpperCase() + rest;
 };
 
 const displayNone = () => {
     homeDiv.classList.add('d-none');
     questionsDiv.classList.add('d-none');
     resultsDiv.classList.add('d-none');
-};
-
-const generateQuestion = (question) => {
-    inputsAnswersHolder.innerHTML = '';
-    singleQuestionTitle.innerText = '';
-    singleQuestionTitle.innerText = question.question;
-
-    let answers = Object.entries(question.answers);
-    let shuffledAnswers = answers.sort(() => Math.random() - 0.5);
-
-    shuffledAnswers.forEach(([key, value]) => {
-        if (value !== null) {
-            value = capitalize(value);
-            Object.entries(question.correct_answers).forEach(([key, value]) => {
-                if (value === 'true') {
-                    correctAnswerKey = key.replace('_correct', '');
-                }
-            })
-            const div = document.createElement('div');
-            div.setAttribute('class', 'container d-flex align-items-center gap-3 mb-3 justify-content-between');
-            const label = document.createElement('label');
-            label.setAttribute('for', key);
-            div.setAttribute('class', 'form-check-label');
-            label.innerText = value;
-            div.appendChild(label);
-            const input = document.createElement('input');
-            input.setAttribute('id', key);
-            input.setAttribute('type', 'radio');
-            input.setAttribute('class', 'answer form-check-input');
-            input.setAttribute('name', 'answer');
-            div.appendChild(input);
-            inputsAnswersHolder.appendChild(div);
-        }
-    });
-};
-
-const setNextQuestion = () => {
-    generateQuestion(questions[currentQuestionIndex]);
-}
-
-const nextAnswer = (e) => {
-    e.preventDefault();
-    if (answersValidation()) {
-    const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked; ////------
-    console.log('status answer', statusAnswer);
-    if (statusAnswer) {
-        correctAnswersCounter += 1;
-    }
-    currentQuestionIndex++;
-    if (questions.length > currentQuestionIndex + 1) {
-        setNextQuestion(currentQuestionIndex);
-    } else {
-        const user = {};
-        user.name = inputUserName.value;
-        user.points = correctAnswersCounter*10;
-        saveUserOnStorage(user);
-        displayNone();
-        resultsDiv.classList.remove('d-none');
-    }
-} else {
-    appendAlert('Please check one answer.', 'danger', error)
-}
 };
 
 //Validations
@@ -144,25 +86,80 @@ const saveUserOnStorage = (user) => {
             }
         }
     }
+};
+
+const generateQuestion = (question) => {
+    inputsAnswersHolder.innerHTML = '';
+    singleQuestionTitle.innerText = '';
+    singleQuestionTitle.innerText = question.question;
+
+    let answers = Object.entries(question.answers);
+    let shuffledAnswers = answers.sort(() => Math.random() - 0.5);
+
+    shuffledAnswers.forEach(([key, value]) => {
+        if (value !== null) {
+            value = capitalize(value);
+            Object.entries(question.correct_answers).forEach(([key, value]) => {
+                if (value === 'true') {
+                    correctAnswerKey = key.replace('_correct', '');
+                }
+            })
+            const div = document.createElement('div');
+            div.setAttribute('class', 'container d-flex align-items-center gap-3 mb-3 justify-content-between');
+            const label = document.createElement('label');
+            label.setAttribute('for', key);
+            div.setAttribute('class', 'form-check-label');
+            label.innerText = value;
+            div.appendChild(label);
+            const input = document.createElement('input');
+            input.setAttribute('id', key);
+            input.setAttribute('type', 'radio');
+            input.setAttribute('class', 'answer form-check-input');
+            input.setAttribute('name', 'answer');
+            div.appendChild(input);
+            inputsAnswersHolder.appendChild(div);
+        }
+    });
+};
+
+const setNextQuestion = () => {
+    generateQuestion(questions[currentQuestionIndex]);
+};
+
+const nextAnswer = (e) => {
+    e.preventDefault();
+    if (answersValidation()) {
+    const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked; ////------
+    console.log('status answer', statusAnswer);
+    if (statusAnswer) {
+        correctAnswersCounter += 1;
+    }
+    currentQuestionIndex++;
+    if (questions.length > currentQuestionIndex + 1) {
+        setNextQuestion(currentQuestionIndex);
+    } else {
+        const user = {};
+        user.name = inputUserName.value;
+        user.points = correctAnswersCounter*10;
+        saveUserOnStorage(user);
+        displayNone();
+        resultsDiv.classList.remove('d-none');
+    }
+} else {
+    appendAlert('Please check one answer.', 'danger', error)
 }
-
-
-//Funcion para generar Alerts. Primer argumento para el mensaje. Segundo para el tipo segun Bootstrap https://getbootstrap.com/docs/5.3/components/alerts/#link-color
-const appendAlert = (message, type, where) => {
-    where.innerHTML = `<div id='appendedWraper' class="mt-2 alert alert-${type} alert-dismissible" role="alert">
-                            <div>${message}</div>
-                        </div>`;
-    setTimeout(function () {
-        where.innerHTML = '';
-    }, 3000);
 };
 
-const capitalize = (text) => {
-    const firstLetter = text.charAt(0);
-    const rest = text.slice(1);
-    return firstLetter.toUpperCase() + rest;
+const startQuiz = (e) => {
+    e.preventDefault();
+    currentQuestionIndex = 0;
+    if (nameValidation()) {
+        displayNone();
+        questionsDiv.classList.remove('d-none');
+    
+        setNextQuestion(questions, currentQuestionIndex);
+    }
 };
-
 
 startButton.addEventListener('click', startQuiz);
 nextBtnForm.addEventListener('click', nextAnswer);
