@@ -10,25 +10,32 @@ const inputsAnswersHolder = document.getElementById('inputs_answers_form');
 const error = document.getElementById('error_holder');
 const restartBtn = document.getElementById('restart-btn');
 
-let currentQuestionIndex = 0;
+let questions;
+let currentQuestionIndex;
 
 let correctAnswerKey;
 let correctAnswersCounter = 0;
 
-let questions = [];
+let URLAPI = 'https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl&limit=10';
 
-axios.get('https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl&limit=10')
-    .then(res => questions = res.data)
-    .catch(error => console.log(error));
+const downloadData = async () => {
+    try {
+        const res = await axios.get(URLAPI);
+        questions = res.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+downloadData();
 
 const startQuiz = (e) => {
     e.preventDefault();
+    currentQuestionIndex = 0;
     if (nameValidation()) {
-        let currentQuestionIndex = 0;
         displayNone();
         questionsDiv.classList.remove('d-none');
     
-        setNextQuestion(currentQuestionIndex);
+        setNextQuestion(questions, currentQuestionIndex);
     }
 };
 
@@ -39,7 +46,6 @@ const displayNone = () => {
 };
 
 const generateQuestion = (question) => {
-    console.log('Pregunta', question);
     inputsAnswersHolder.innerHTML = '';
     singleQuestionTitle.innerText = '';
     singleQuestionTitle.innerText = question.question;
@@ -56,15 +62,16 @@ const generateQuestion = (question) => {
                 }
             })
             const div = document.createElement('div');
-            div.setAttribute('class', 'container d-flex align-items-center gap-3 mb-3');
+            div.setAttribute('class', 'container d-flex align-items-center gap-3 mb-3 justify-content-between');
             const label = document.createElement('label');
-            label.setAttribute('for', key)
+            label.setAttribute('for', key);
+            div.setAttribute('class', 'form-check-label');
             label.innerText = value;
             div.appendChild(label);
             const input = document.createElement('input');
             input.setAttribute('id', key);
             input.setAttribute('type', 'radio');
-            input.setAttribute('class', 'd-flex align-items-start answer');
+            input.setAttribute('class', 'answer form-check-input');
             input.setAttribute('name', 'answer');
             div.appendChild(input);
             inputsAnswersHolder.appendChild(div);
@@ -72,14 +79,14 @@ const generateQuestion = (question) => {
     });
 };
 
-const setNextQuestion = (currentQuestionIndex) => {
+const setNextQuestion = () => {
     generateQuestion(questions[currentQuestionIndex]);
 }
 
 const nextAnswer = (e) => {
     e.preventDefault();
     if (answersValidation()) {
-    const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked;
+    const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked; ////------
     console.log('status answer', statusAnswer);
     if (statusAnswer) {
         correctAnswersCounter += 1;
