@@ -105,7 +105,6 @@ const printYourScore = (user) => {
     cardBody.appendChild(cardTitle);
     cardBody.appendChild(score);
     yourScoreDiv.appendChild(card);
-    yourScoreDiv.classList.remove('d-none');
 };
 
 const saveUserOnStorage = (user) => {
@@ -167,34 +166,6 @@ const setNextQuestion = () => {
     generateQuestion(questions[currentQuestionIndex]);
 };
 
-const nextAnswer = (e) => {
-    e.preventDefault();
-    if (answersValidation()) {
-        const statusAnswer = document.getElementById(`${correctAnswerKey}`).checked;
-        if (statusAnswer) {
-            correctAnswersCounter += 1;
-        }
-        currentQuestionIndex++;
-        if (questions.length > currentQuestionIndex) {
-            setNextQuestion(currentQuestionIndex);
-        } else {
-            const user = {};
-            user.name = inputUserName.value;
-            userForm.reset();
-            user.points = correctAnswersCounter * 10;
-            saveUserOnStorage(user);
-            displayNone();
-            showChartAndRanking();
-            printYourScore(user);
-            printRanking();
-            resultsDiv.classList.remove('d-none');
-            restartBtn.classList.remove('d-none');
-        }
-    } else {
-        appendAlert('Please check one answer.', 'danger', error)
-    }
-};
-
 const startQuiz = (e) => {
     e.preventDefault();
     currentQuestionIndex = 0;
@@ -206,24 +177,52 @@ const startQuiz = (e) => {
     }
 };
 
-const myChart = (config) => new Chart('myChart', config);
+const printRanking = () => {
+    rankingUsersDiv.innerHTML = '';
+    let usersArr = JSON.parse(localStorage.getItem("AllUsers")) || [];
+    usersArr = usersArr.sort(((a, b) => a.points - b.points)).toReversed().slice(0, 3);
 
-const showChartAndRanking = () => {
+    if (usersArr.length === 0) {
+        const h1Card = document.createElement('h1');
+        h1Card.innerText = `Sorry!! Nobody has played`;
+        rankingDiv.appendChild(h1Card);
+    } else {
+        const h1Card = document.createElement('h1');
+        h1Card.innerText = 'Best Players';
+        rankingUsersDiv.appendChild(h1Card);
+        usersArr.forEach((user, index) => {
+            const card = document.createElement('div');
+            card.setAttribute('id', `div${user.name}`);
+            card.setAttribute('class', 'card mb-2');
+            const cardBody = document.createElement('div');
+            cardBody.setAttribute('class', 'card-body');
+            const h2Card = document.createElement('h2');
+            h2Card.innerText = `${index + 1}. ${user.name} whit ${user.points} points.`;
+            card.appendChild(cardBody);
+            cardBody.appendChild(h2Card);
+            rankingUsersDiv.appendChild(card);
+        })
+    }
+};
+
+const generateNewChart = (config) => new Chart('myChart', config);
+
+const printChart = () => {
     canvasHolder.innerHTML = '';
-    const newCanvas = document.createElement('canvas');
-    newCanvas.setAttribute('id', 'myChart');
-    canvasHolder.appendChild(newCanvas);
-
 
     let usersArrChart = JSON.parse(localStorage.getItem("AllUsers")) || [];
 
     if (usersArrChart.length !== 0) {
+        canvasHolder.innerHTML = `<h1 class="mt-2">History Chart</h1>`;
+        const newCanvas = document.createElement('canvas');
+        newCanvas.setAttribute('id', 'myChart');
+        canvasHolder.appendChild(newCanvas);
         let labels = usersArrChart.map(user => user.name);
         let scores = usersArrChart.map(user => user.points);
         const colorR = getRandomIntInclusive(0, 255);
         const colorG = getRandomIntInclusive(0, 255);
         const colorB = getRandomIntInclusive(0, 255);
-        
+
         const data = {
             labels: labels,
             datasets: [{
@@ -240,52 +239,56 @@ const showChartAndRanking = () => {
             options: {}
         };
 
-        myChart(config);
-        printRanking();
+        generateNewChart(config);
         canvasHolder.classList.remove('d-none');
     } else {
         displayNone();
         resultsDiv.classList.remove('d-none');
-
     }
 };
 
-const printRanking = () => {
-    rankingUsersDiv.innerHTML = '';
-    let usersArr = JSON.parse(localStorage.getItem("AllUsers")) || [];
-    usersArr = usersArr.sort(((a, b) => a.points - b.points)).toReversed().slice(0, 3);
+const showStats = () => {
+    displayNone();
+    printRanking();
+    printChart();
+    resultsDiv.classList.remove('d-none');
+    canvasHolder.classList.remove('d-none');
+}
 
-    if (usersArr.length === 0) {
-        const h2Card = document.createElement('h1');
-        h2Card.innerText = `Sorry!! Nobody has played`;
-        rankingUsersDiv.appendChild(h2Card);
+const controlStatusAnswer = (e) => {
+    e.preventDefault();
+    if (answersValidation()) {
+        const statusCorrectAnswer = document.getElementById(`${correctAnswerKey}`).checked;
+        if (statusCorrectAnswer) {
+            correctAnswersCounter += 1;
+        }
+        currentQuestionIndex++;
+        if (questions.length > currentQuestionIndex) {
+            setNextQuestion(currentQuestionIndex);
+        } else {
+            const user = {};
+            user.name = inputUserName.value;
+            userForm.reset();
+            user.points = correctAnswersCounter * 10;
+            saveUserOnStorage(user);
+            showStats();
+            printYourScore(user);
+            yourScoreDiv.classList.remove('d-none');
+            restartBtn.classList.remove('d-none');
+        }
     } else {
-        usersArr.forEach((user, index) => {
-            const card = document.createElement('div');
-            card.setAttribute('id', `div${user.name}`);
-            card.setAttribute('class', 'card');
-            const cardBody = document.createElement('div');
-            cardBody.setAttribute('class', 'card-body');
-            const h2Card = document.createElement('h2');
-            h2Card.innerText = `${index + 1}. ${user.name} whit ${user.points} points.`;
-            card.appendChild(cardBody);
-            cardBody.appendChild(h2Card);
-            rankingUsersDiv.appendChild(card);
-        })
+        appendAlert('Please check one answer.', 'danger', error)
     }
 };
 
 startButton.addEventListener('click', startQuiz);
-nextBtnForm.addEventListener('click', nextAnswer);
+nextBtnForm.addEventListener('click', controlStatusAnswer);
 restartBtn.addEventListener('click', () => {
     displayNone();
     homeDiv.classList.remove('d-none');
 });
 navLinkStats.addEventListener('click', () => {
-    showChartAndRanking();
-    displayNone();
-    resultsDiv.classList.remove('d-none');
-    canvasHolder.classList.remove('d-none');
+    showStats();
 });
 navLinkContact.addEventListener('click', () => {
     displayNone();
