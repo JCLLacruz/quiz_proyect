@@ -3,6 +3,7 @@ const questionsDiv = document.getElementById('questions-div');
 const resultsDiv = document.getElementById('results-div');
 const contactDiv = document.getElementById('contact-div');
 const startButton = document.getElementById('start-button');
+const userForm = document.getElementById('user-form');
 const inputUserName = document.getElementById('input-user-name');
 const nextBtnForm = document.getElementById('next_btn_form');
 const answersForm = document.getElementById('answers_form');
@@ -28,7 +29,7 @@ let URLAPI = 'https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFg
 
 const goToLink = (url) => {
     window.location.href = url;
-}
+};
 
 const downloadData = async () => {
     try {
@@ -39,6 +40,12 @@ const downloadData = async () => {
     }
 };
 downloadData();
+
+const getRandomIntInclusive = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min);
+};
 
 const appendAlert = (message, type, where) => {
     where.innerHTML = `<div id='appendedWraper' class="mt-2 alert alert-${type} alert-dismissible" role="alert">
@@ -127,7 +134,6 @@ const generateQuestion = (question) => {
 
     let answers = Object.entries(question.answers);
     let shuffledAnswers = answers.sort(() => Math.random() - 0.5);
-    console.log('Question', question);
 
     shuffledAnswers.forEach(([key, value]) => {
         if (value !== null) {
@@ -174,6 +180,7 @@ const nextAnswer = (e) => {
         } else {
             const user = {};
             user.name = inputUserName.value;
+            userForm.reset();
             user.points = correctAnswersCounter * 10;
             saveUserOnStorage(user);
             displayNone();
@@ -207,30 +214,34 @@ const showChartAndRanking = () => {
     newCanvas.setAttribute('id', 'myChart');
     canvasHolder.appendChild(newCanvas);
 
-    printRanking();
 
     let usersArrChart = JSON.parse(localStorage.getItem("AllUsers")) || [];
 
-    if (usersArrChart.length !== 0){
+    if (usersArrChart.length !== 0) {
         let labels = usersArrChart.map(user => user.name);
         let scores = usersArrChart.map(user => user.points);
-    
+        const colorR = getRandomIntInclusive(0, 255);
+        const colorG = getRandomIntInclusive(0, 255);
+        const colorB = getRandomIntInclusive(0, 255);
+        
         const data = {
             labels: labels,
             datasets: [{
                 label: 'Users Scores',
-                backgroundColor: 'rgb(25, 25, 25)',
+                backgroundColor: `rgb(${colorR},${colorG},${colorB})`,
                 borderColor: 'rgb(255, 99, 132)',
                 data: scores,
             }]
         };
-    
+
         const config = {
             type: 'bar',
             data: data,
             options: {}
         };
+
         myChart(config);
+        printRanking();
         canvasHolder.classList.remove('d-none');
     } else {
         displayNone();
@@ -256,7 +267,7 @@ const printRanking = () => {
             const cardBody = document.createElement('div');
             cardBody.setAttribute('class', 'card-body');
             const h2Card = document.createElement('h2');
-            h2Card.innerText = `${index+1}. ${user.name} whit ${user.points} points.`;
+            h2Card.innerText = `${index + 1}. ${user.name} whit ${user.points} points.`;
             card.appendChild(cardBody);
             cardBody.appendChild(h2Card);
             rankingUsersDiv.appendChild(card);
