@@ -22,17 +22,61 @@ const darkModeBtn = document.getElementById("dark_mode_btn");
 const ligthModeBtn = document.getElementById("ligth_mode_btn");
 const navBar = document.getElementById("nav_bar");
 const navBarTogglerBtn = document.getElementById("navbar-toggler-btn");
-let rankingCads = [];
+const selectCategories = document.getElementById("select_category");
+
 const body = document.querySelector("body");
 
 let questions;
+let categories;
 let currentQuestionIndex;
 
 let correctAnswerKey;
 let correctAnswersCounter = 0;
 
-let URLAPI =
-  "https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl&limit=10";
+let urlQuestions = "";
+const urlCategories =
+  "https://quizapi.io//api/v1/categories?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl";
+
+const downloadQuestions = async () => {
+  try {
+    const res = await axios.get(urlQuestions);
+    questions = res.data.slice(0, 10);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const printCategories = () => {
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.setAttribute("value", `${category.name}`);
+    option.innerText = category.name;
+    selectCategories.appendChild(option);
+  });
+};
+
+const downloadCategories = async () => {
+  try {
+    const res = await axios.get(urlCategories);
+    categories = res.data;
+    printCategories();
+  } catch (error) {
+    console.error(error);
+  }
+};
+downloadCategories();
+
+const selectedCategorie = () => {
+  const value = selectCategories.options[selectCategories.selectedIndex].value;
+
+  if (value === "allcategories") {
+    urlQuestions = `https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl&limit=10`;
+  } else {
+    urlQuestions = `https://quizapi.io/api/v1/questions?apiKey=MGitvh0Vb19uQfvuYcKNsFgkxgZi4GImf2jwImrl&category=${value}`;
+  }
+  downloadQuestions();
+};
+selectedCategorie();
 
 const lightMode = () => {
   const bgDarkArr = document.querySelectorAll(".bg-dark");
@@ -66,20 +110,6 @@ const darkMode = () => {
   darkModeBtn.classList.add("d-none");
   ligthModeBtn.classList.remove("d-none");
 };
-
-const goToLink = (url) => {
-  window.location.href = url;
-};
-
-const downloadData = async () => {
-  try {
-    const res = await axios.get(URLAPI);
-    questions = res.data;
-  } catch (error) {
-    console.error(error);
-  }
-};
-downloadData();
 
 const getRandomIntInclusive = (min, max) => {
   min = Math.ceil(min);
@@ -211,7 +241,9 @@ const setNextQuestion = () => {
 
 const startQuiz = (e) => {
   e.preventDefault();
+
   currentQuestionIndex = 0;
+
   if (nameValidation()) {
     displayNone();
     questionsDiv.classList.remove("d-none");
@@ -250,7 +282,6 @@ const printRanking = () => {
       cardBody.appendChild(h2Card);
       rankingUsersDiv.appendChild(card);
     });
-    rankingCads.push(document.querySelectorAll(".ranking"));
   }
 };
 

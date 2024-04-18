@@ -36,10 +36,18 @@
     <main class="container align-items-center list-group p-1">
         <div class="container p-1">
             <div id="home-div" class="container shadow rounder p-3 bg-white border">
-                <h2 class="mt-1 text-center">Enter your name and enjoy it!</h2>
                 <form id="user-form" class="d-flex flex-column align-items-center">
-                <div class="input-group mt-2 mb-3">
-                    <input id="input-user-name" type="text" class="form-control" aria-label="Sizing input">
+                <div>
+                    <h2 class="mt-1 text-center">Select the category</h2>
+                    <select id="select_category" name="select" class="form-select">
+                        <option value="allcategories">All Categories</option>
+                      </select>
+                </div>
+                <div>
+                    <h2 class="mt-1 text-center">Enter your name and enjoy it!</h2>
+                    <div class="input-group mt-2 mb-3">
+                        <input id="input-user-name" type="text" class="form-control" aria-label="Sizing input">
+                    </div>
                 </div>
                     <button id="start-button" class="btn btn-primary mb-3 w-100">Start Game</button>
                 </form>
