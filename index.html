@@ -5,17 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" async></script>
-    
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js" async></script>
     <script src="./js/main.js" async defer></script>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
     <title>Develop Quiz</title>
 </head>
 
-<body class="d-flex flex-column gb-dark">
-    <div class="list-group mt-2 mb-3 p-1">
-        <nav id="nav_bar" class="navbar navbar-expand-lg navbar-light bg-light">
+<body class="d-flex flex-column align-items-center bg-white">
+    <div class="list-group mt-2 mb-3 p-1 w-100">
+        <nav id="nav_bar" class="navbar navbar-expand-lg navbar-light bg-light" data-bs-theme="light">
             <a id="titleQuiz" href="#" class="navbar-brand ms-2">
                 <h1 class="pt-2">Developer Quiz</h1>
             </a>
@@ -37,7 +35,7 @@
     </div>
     <main class="container align-items-center list-group p-1">
         <div class="container p-1">
-            <div id="home-div" class="container shadow rounder p-3 bg-white border list-group-item">
+            <div id="home-div" class="container shadow rounder p-3 bg-white border">
                 <h2 class="mt-1 text-center">Enter your name and enjoy it!</h2>
                 <form id="user-form" class="d-flex flex-column align-items-center">
                 <div class="input-group mt-2 mb-3">
@@ -46,30 +44,28 @@
                     <button id="start-button" class="btn btn-primary mb-3 w-100">Start Game</button>
                 </form>
             </div>
-            <div id="questions-div" class="container shadow rounder p-3 bg-white d-none list-group-item">
+            <div id="questions-div" class="container shadow rounder p-3 bg-white d-none">
                 <div class="progress mt-2 mb-4">
                     <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                 <h1 id="single_question_title"></h1>
                 <form id="answers_form" class="container rounder p-3 bg-white">
-                    <div id="inputs_answers_form" class="d-flex flex-column  gap-3">
-    
-                    </div>
+                    <div id="inputs_answers_form" class="d-flex flex-column  gap-3"></div>
                     <div class="mt-5">
                         <button id="next_btn_form" class="btn btn-primary" type="submit">Next</button>
                     </div>
                 </form>
             </div>
-            <div id="results-div" class="container shadow rounder p-3 bg-white d-none list-group-item">
+            <div id="results-div" class="container shadow rounder p-3 bg-white d-none">
                 <div id="your-score" class="container"></div>
                 <div id="canvas-holder" class="container card mt-3"></div>
                 <div id="ranking">
-                    <div id="ranking_users" class="container my-3 pt-2 card"></div>
+                    <div id="ranking_users" class="container my-3 pt-2 card bg-light"></div>
                 </div>
                 <button id="restart-btn" class="btn btn-primary d-none">Restart Game</button>
             </div>
             <div id="error_holder"></div>
-            <div id="contact-div" class="container shadow rounder p-3 bg-white d-none list-group-item">
+            <div id="contact-div" class="container shadow rounder p-3 bg-white d-none">
                 <h1>Juan Carlos Lacruz Lacruz</h1>
                 <h3>Web Developer in Progress</h3>
                 <div id="social-media" class="d-flex">
@@ -79,6 +75,8 @@
             </div>
         </div>
     </main>
+    <button id="dark_mode_btn" class="btn btn-primary w-75 mt-3">Dark-Mode</button>
+    <button id="ligth_mode_btn" class="btn btn-primary w-75 mt-3 d-none">Ligth-Mode</button>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
