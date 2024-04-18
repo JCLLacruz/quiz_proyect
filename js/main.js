@@ -331,9 +331,15 @@ const showStats = () => {
   printChart();
   if (darkModeBtn.classList.contains("d-none")) {
     darkMode();
+  } 
+  if (rankingUsersDiv.childElementCount !== 0){
+    rankingUsersDiv.classList.remove('d-none');
+    nobodyH1.classList.add('d-none');
+  } else {
+    nobodyH1.classList.remove('d-none');
+
   }
   resultsDiv.classList.remove("d-none");
-  nobodyH1.classList.remove('d-none');
 };
 
 const controlStatusAnswer = (e) => {
