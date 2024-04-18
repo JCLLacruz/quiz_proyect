@@ -9,7 +9,7 @@ User answers are validated to ensure that at least one option is selected. After
 The application uses Chart.js to generate the bar chart displaying the score history. Additionally, it utilizes localStorage to store user data and display the ranking even after the page is reloaded.
 
 ## Styling
-The styling has been done using a Bootswatch theme (https://bootswatch.com/), which are themes based on Bootstrap. To apply it, the necessary classes have been added to the HTML.
+The styling has been done using a Bootswatch theme (https://bootswatch.com/), which are themes based on Bootstrap. To apply it, the necessary classes have been added to the HTML. It has a button that changes the appearance of the application between light and dark.
 
 ## Key Features
 - Quiz Start: Users can start the quiz by entering their name and clicking the start button.
