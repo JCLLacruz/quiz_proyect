@@ -140,6 +140,7 @@ const displayNone = () => {
   restartBtn.classList.add("d-none");
   canvasHolder.classList.add("d-none");
   yourScoreDiv.classList.add("d-none");
+  rankingUsersDiv.classList.add("d-none");
 };
 
 const nameValidation = () => {
@@ -263,8 +264,10 @@ const printRanking = () => {
 
   if (usersArr.length === 0) {
     const h1Card = document.createElement("h1");
-    h1Card.innerText = `Sorry!! Nobody has played`;
-    rankingDiv.appendChild(h1Card);
+    h1Card.innerText = `Sorry!! Nobody has played.`;
+    resultsDiv.appendChild(h1Card);
+    displayNone();
+    resultsDiv.classList.remove('d-none');
   } else {
     const h1Card = document.createElement("h1");
     h1Card.innerText = "Best Players";
@@ -326,7 +329,6 @@ const printChart = () => {
     canvasHolder.classList.remove("d-none");
   } else {
     displayNone();
-    resultsDiv.classList.remove("d-none");
   }
 };
 
@@ -337,8 +339,11 @@ const showStats = () => {
   if (darkModeBtn.classList.contains("d-none")) {
     darkMode();
   }
+  if (localStorage.AllUsers) {
+    rankingUsersDiv.classList.remove("d-none");
+    canvasHolder.classList.remove("d-none");
+  }
   resultsDiv.classList.remove("d-none");
-  canvasHolder.classList.remove("d-none");
 };
 
 const controlStatusAnswer = (e) => {
