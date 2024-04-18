@@ -364,7 +364,7 @@ const controlStatusAnswer = (e) => {
       restartBtn.classList.remove("d-none");
     }
   } else {
-    appendAlert("Please check one answer.", "danger", error);
+    appendAlert("Please choose an answer.", "danger", error);
   }
 };
 
