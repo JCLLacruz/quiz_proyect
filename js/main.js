@@ -161,6 +161,7 @@ const answersValidation = () => {
 };
 
 const printYourScore = (user) => {
+  yourScoreDiv.innerHTML = '';
   const { name, points } = user;
   const card = document.createElement("div");
   card.setAttribute("class", "card");
