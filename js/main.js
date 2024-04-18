@@ -251,8 +251,6 @@ const printRanking = () => {
       rankingUsersDiv.appendChild(card);
     });
     rankingCads.push(document.querySelectorAll(".ranking"));
-
-    console.log("ranking cards", rankingCads);
   }
 };
 
