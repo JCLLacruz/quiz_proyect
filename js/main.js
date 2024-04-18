@@ -23,7 +23,7 @@ const ligthModeBtn = document.getElementById("ligth_mode_btn");
 const navBar = document.getElementById("nav_bar");
 const navBarTogglerBtn = document.getElementById("navbar-toggler-btn");
 const selectCategories = document.getElementById("select_category");
-
+const nobodyH1 = document.getElementById('no_body_played');
 const body = document.querySelector("body");
 
 let questions;
@@ -141,6 +141,7 @@ const displayNone = () => {
   canvasHolder.classList.add("d-none");
   yourScoreDiv.classList.add("d-none");
   rankingUsersDiv.classList.add("d-none");
+  nobodyH1.classList.add("d-none");
 };
 
 const nameValidation = () => {
@@ -262,13 +263,7 @@ const printRanking = () => {
     .toReversed()
     .slice(0, 3);
 
-  if (usersArr.length === 0) {
-    const h1Card = document.createElement("h1");
-    h1Card.innerText = `Sorry!! Nobody has played.`;
-    resultsDiv.appendChild(h1Card);
-    displayNone();
-    resultsDiv.classList.remove('d-none');
-  } else {
+  if (usersArr.length !== 0) {
     const h1Card = document.createElement("h1");
     h1Card.innerText = "Best Players";
     rankingUsersDiv.appendChild(h1Card);
@@ -279,13 +274,11 @@ const printRanking = () => {
       const cardBody = document.createElement("div");
       cardBody.setAttribute("class", "card-body");
       const h2Card = document.createElement("h2");
-      h2Card.innerText = `${index + 1}. ${user.name} whit ${
-        user.points
-      } points.`;
+      h2Card.innerText = `${index + 1}. ${user.name} whit ${user.points} points.`;
       card.appendChild(cardBody);
       cardBody.appendChild(h2Card);
       rankingUsersDiv.appendChild(card);
-    });
+    })
   }
 };
 
@@ -339,11 +332,8 @@ const showStats = () => {
   if (darkModeBtn.classList.contains("d-none")) {
     darkMode();
   }
-  if (localStorage.AllUsers) {
-    rankingUsersDiv.classList.remove("d-none");
-    canvasHolder.classList.remove("d-none");
-  }
   resultsDiv.classList.remove("d-none");
+  nobodyH1.classList.remove('d-none');
 };
 
 const controlStatusAnswer = (e) => {
